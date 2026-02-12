@@ -50,16 +50,46 @@ export default function MindMapView({ markdown }: MindMapProps) {
   }, [markdown]);
 
   const handleExport = () => {
-    if (svgRef.current) {
-      const svgData = new XMLSerializer().serializeToString(svgRef.current);
-      const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "mindmap.svg";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    // Export raw Markdown with specific Markmap frontmatter/format if needed, or just plain MD for now as it's the source of truth.
+    // Standard mindmap formats (like FreeMind/XMind) require heavy XML conversion. 
+    // Markmap's "native" format IS Markdown. So we export the markdown but with a specific extension/name.
+    // Or we can export an HTML file that self-renders the mindmap (portable).
+    
+    // Let's do Portable HTML for now - most useful "mindmap format" for sharing.
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lumos Mindmap</title>
+<style>
+svg { width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
+<script>
+const { markmap } = window;
+const { Transformer } = window.markmap;
+const transformer = new Transformer();
+const markdown = ${JSON.stringify(markdown)};
+const { root } = transformer.transform(markdown);
+markmap.Markmap.create('#mindmap', null, root);
+</script>
+</body>
+</html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mindmap.html";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
