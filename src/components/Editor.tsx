@@ -49,7 +49,15 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange }: Edi
     setVditor(vditorInstance);
 
     return () => {
-      vditorInstance?.destroy();
+      // Vditor's destroy method might be buggy if called too early or if instance isn't fully ready
+      // Safe check before destroying
+      if (vditorInstance) {
+        try {
+          vditorInstance.destroy();
+        } catch (e) {
+          console.warn("Vditor destroy error:", e);
+        }
+      }
       setVditor(undefined);
     };
   }, []);
