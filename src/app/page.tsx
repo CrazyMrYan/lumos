@@ -19,14 +19,9 @@ const SlidesView = dynamic(() => import("@/components/SlidesView"), {
   loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Slides...</div>,
 });
 
-const WebsiteView = dynamic(() => import("@/components/WebsiteView"), {
-  ssr: false,
-  loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Website...</div>,
-});
-
 export default function Home() {
   const [content, setContent] = useState<string>("# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n---\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap\n- Site: Next.js + Tailwind");
-  const [activeView, setActiveView] = useState<"slides" | "mindmap" | "site">("mindmap");
+  const [activeView, setActiveView] = useState<"slides" | "mindmap">("mindmap");
 
   return (
     <main className="flex h-screen w-full">
@@ -65,22 +60,12 @@ export default function Home() {
               <Presentation className="w-4 h-4" />
               Slides
             </button>
-            <button
-              onClick={() => setActiveView("site")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                activeView === "site" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Monitor className="w-4 h-4" />
-              Website
-            </button>
           </div>
         </div>
         
         <div className="flex-1 p-4 overflow-hidden relative">
           {activeView === "mindmap" && <MindMapView markdown={content} />}
           {activeView === "slides" && <SlidesView key={content} markdown={content} />}
-          {activeView === "site" && <WebsiteView markdown={content} />}
         </div>
       </div>
     </main>

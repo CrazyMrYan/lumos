@@ -1,98 +1,138 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Reveal from "reveal.js";
 import Markdown from "reveal.js/plugin/markdown/markdown";
 import Highlight from "reveal.js/plugin/highlight/highlight";
 import Notes from "reveal.js/plugin/notes/notes";
 import "reveal.js/dist/reveal.css";
-import "reveal.js/dist/theme/white.css";
+// Remove static theme import
 import "reveal.js/plugin/highlight/monokai.css";
 
 interface SlidesViewProps {
   markdown: string;
 }
 
+const THEMES = [
+  "black",
+  "white",
+  "league",
+  "beige",
+  "sky",
+  "night",
+  "serif",
+  "simple",
+  "solarized",
+  "blood",
+  "moon",
+];
+
 export default function SlidesView({ markdown }: SlidesViewProps) {
   const deckRef = useRef<HTMLDivElement>(null);
   const revealInstance = useRef<Reveal.Api | null>(null);
+  const [currentTheme, setCurrentTheme] = useState("black"); // Default theme
+
+  // Handle Theme Injection
+  useEffect(() => {
+    const linkId = "reveal-theme-css";
+    let link = document.getElementById(linkId) as HTMLLinkElement;
+    
+    if (!link) {
+      link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    
+    // Dynamically load theme from node_modules path served by Next.js public or via CDN?
+    // Since we can't easily serve node_modules assets in Next.js without config,
+    // we will use a CDN for themes for the MVP to keep it lightweight.
+    // Alternatively, we could import all CSS files and toggle, but that's heavy.
+    // Using unpkg/jsdelivr is standard for Reveal themes if not bundled.
+    link.href = `https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/theme/${currentTheme}.css`;
+    
+    return () => {
+      // Don't remove link on unmount to prevent flash of unstyled content if re-mounting
+    };
+  }, [currentTheme]);
 
   useEffect(() => {
     if (!deckRef.current) return;
 
-    // Destroy previous instance if it exists to prevent memory leaks/glitches
+    // Cleanup previous instance
     if (revealInstance.current) {
-      revealInstance.current.destroy();
+      try {
+        revealInstance.current.destroy();
+        revealInstance.current = null;
+      } catch (e) {
+        console.warn("Reveal destroy error:", e);
+      }
     }
 
-    // Initialize Reveal
-    const deck = new Reveal(deckRef.current, {
-      plugins: [Markdown, Highlight, Notes],
-      embedded: true, // Crucial for embedding in a div
-      hash: false,
-      keyboard: true, // Enable keyboard navigation
-      mouseWheel: false,
-      transition: "slide",
-      backgroundTransition: "fade",
-    });
+    // Initialize Reveal with a small delay to ensure DOM is ready and prevent 'parentNode' errors
+    const initTimer = setTimeout(() => {
+      if (!deckRef.current) return;
 
-    deck.initialize().then(() => {
-      revealInstance.current = deck;
-    });
+      const deck = new Reveal(deckRef.current, {
+        plugins: [Markdown, Highlight, Notes],
+        embedded: true,
+        hash: false,
+        keyboard: true,
+        mouseWheel: false,
+        transition: "slide",
+        backgroundTransition: "fade",
+        // Disable scroll view for now as it causes errors in embedded mode
+        view: "default", 
+      });
+
+      deck.initialize().then(() => {
+        revealInstance.current = deck;
+      });
+    }, 50);
 
     return () => {
+      clearTimeout(initTimer);
       if (revealInstance.current) {
         try {
           revealInstance.current.destroy();
+          revealInstance.current = null;
         } catch (e) {
-          // Ignore destroy errors
+          console.warn("Reveal destroy cleanup error:", e);
         }
       }
     };
-  }, []); // Only re-init when mounting
+  }, []);
 
-  // Update content dynamically
+  // Update content
   useEffect(() => {
-    if (revealInstance.current && deckRef.current) {
-      // Reveal.js markdown plugin expects raw markdown in a script tag or section
-      // But for dynamic updates, we might need to manually sync or re-render
-      // For MVP, we will rely on re-mounting or syncing the DOM structure
-      
-      // Simple hack: direct DOM manipulation for instant feedback if possible
-      // But Reveal needs re-layout.
-      
-      const slidesContainer = deckRef.current.querySelector(".slides");
-      if (slidesContainer) {
-        // Convert simple markdown split by '---' to sections
-        // This is a naive client-side transformer. 
-        // Real implementation would use a proper markdown parser.
-        
-        const sections = markdown.split(/\n---\n/).map(slideMd => {
-            return `<section data-markdown><textarea data-template>${slideMd}</textarea></section>`;
-        }).join("");
-        
-        slidesContainer.innerHTML = sections;
-        
-        // Sync and layout
-        revealInstance.current.sync();
-        revealInstance.current.layout();
-        
-        // Re-run markdown plugin parsing (tricky in runtime)
-        // For smoother MVP, we might force a re-init if content changes drastically
-        // Or better: use the markdown plugin's API if exposed.
-        
-        // Actually, the most robust way for React + Reveal dynamic content 
-        // is to destroy and re-create, or use key-based remounting.
-      }
-    }
+    // For MVP stability: we rely on the parent component key={content} to force re-mount
+    // instead of trying to update Reveal.js in-place via DOM manipulation.
+    // This is less efficient but 100% bug-free for sync errors.
   }, [markdown]);
 
   return (
-    <div className="reveal w-full h-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" ref={deckRef}>
-      <div className="slides">
-        <section data-markdown="">
-          <textarea data-template defaultValue={markdown} />
-        </section>
+    <div className="relative w-full h-full">
+      {/* Theme Selector UI */}
+      <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur p-2 rounded-lg shadow border border-gray-200 flex items-center gap-2">
+        <label className="text-xs font-semibold text-gray-500 uppercase">Theme</label>
+        <select 
+          value={currentTheme}
+          onChange={(e) => setCurrentTheme(e.target.value)}
+          className="bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer"
+        >
+          {THEMES.map(theme => (
+            <option key={theme} value={theme}>{theme.charAt(0).toUpperCase() + theme.slice(1)}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Reveal Deck */}
+      <div className="reveal w-full h-full bg-gray-100 rounded-xl shadow-sm border border-gray-200 overflow-hidden" ref={deckRef}>
+        <div className="slides">
+          <section data-markdown="">
+            <textarea data-template defaultValue={markdown} />
+          </section>
+        </div>
       </div>
     </div>
   );

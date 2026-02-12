@@ -31,6 +31,18 @@ export default function MindMapView({ markdown }: MindMapProps) {
   useEffect(() => {
     if (mmRef.current && markdown) {
       const { root } = transformer.transform(markdown);
+      
+      // Auto-fold nodes deeper than level 2
+      const walk = (node: any, depth = 0) => {
+        if (depth > 1) {
+          node.p = { ...node.p, f: true }; // f = fold
+        }
+        if (node.c) {
+          node.c.forEach((child: any) => walk(child, depth + 1));
+        }
+      };
+      walk(root);
+
       mmRef.current.setData(root);
       mmRef.current.fit();
     }
