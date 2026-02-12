@@ -38,6 +38,8 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange }: Edi
         "code",
         "inline-code",
         "|",
+        "edit-mode", // Toggle source/wysiwyg
+        "|",
         "undo",
         "redo",
       ],

@@ -8,12 +8,14 @@ import Notes from "reveal.js/plugin/notes/notes";
 import "reveal.js/dist/reveal.css";
 // Remove static theme import
 import "reveal.js/plugin/highlight/monokai.css";
+import { Download } from "lucide-react";
 
 interface SlidesViewProps {
   markdown: string;
 }
 
 const THEMES = [
+  "dracula",
   "black",
   "white",
   "league",
@@ -30,7 +32,7 @@ const THEMES = [
 export default function SlidesView({ markdown }: SlidesViewProps) {
   const deckRef = useRef<HTMLDivElement>(null);
   const revealInstance = useRef<Reveal.Api | null>(null);
-  const [currentTheme, setCurrentTheme] = useState("black"); // Default theme
+  const [currentTheme, setCurrentTheme] = useState("dracula"); // Default theme
 
   // Handle Theme Injection
   useEffect(() => {
@@ -43,23 +45,12 @@ export default function SlidesView({ markdown }: SlidesViewProps) {
       link.rel = "stylesheet";
       document.head.appendChild(link);
     }
-    
-    // Dynamically load theme from node_modules path served by Next.js public or via CDN?
-    // Since we can't easily serve node_modules assets in Next.js without config,
-    // we will use a CDN for themes for the MVP to keep it lightweight.
-    // Alternatively, we could import all CSS files and toggle, but that's heavy.
-    // Using unpkg/jsdelivr is standard for Reveal themes if not bundled.
     link.href = `https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/theme/${currentTheme}.css`;
-    
-    return () => {
-      // Don't remove link on unmount to prevent flash of unstyled content if re-mounting
-    };
   }, [currentTheme]);
 
   useEffect(() => {
     if (!deckRef.current) return;
 
-    // Cleanup previous instance
     if (revealInstance.current) {
       try {
         revealInstance.current.destroy();
@@ -69,7 +60,6 @@ export default function SlidesView({ markdown }: SlidesViewProps) {
       }
     }
 
-    // Initialize Reveal with a small delay to ensure DOM is ready and prevent 'parentNode' errors
     const initTimer = setTimeout(() => {
       if (!deckRef.current) return;
 
@@ -81,7 +71,6 @@ export default function SlidesView({ markdown }: SlidesViewProps) {
         mouseWheel: false,
         transition: "slide",
         backgroundTransition: "fade",
-        // Disable scroll view for now as it causes errors in embedded mode
         view: "default", 
       });
 
@@ -103,27 +92,40 @@ export default function SlidesView({ markdown }: SlidesViewProps) {
     };
   }, []);
 
-  // Update content
-  useEffect(() => {
-    // For MVP stability: we rely on the parent component key={content} to force re-mount
-    // instead of trying to update Reveal.js in-place via DOM manipulation.
-    // This is less efficient but 100% bug-free for sync errors.
-  }, [markdown]);
+  const handleExport = () => {
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "presentation.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="relative w-full h-full">
-      {/* Theme Selector UI */}
-      <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur p-2 rounded-lg shadow border border-gray-200 flex items-center gap-2">
-        <label className="text-xs font-semibold text-gray-500 uppercase">Theme</label>
-        <select 
-          value={currentTheme}
-          onChange={(e) => setCurrentTheme(e.target.value)}
-          className="bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer"
+      {/* Controls */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <div className="bg-white/90 backdrop-blur p-1 rounded-lg shadow border border-gray-200 flex items-center gap-2">
+          <label className="text-xs font-semibold text-gray-500 uppercase px-2">Theme</label>
+          <select 
+            value={currentTheme}
+            onChange={(e) => setCurrentTheme(e.target.value)}
+            className="bg-transparent text-sm font-medium text-gray-800 focus:outline-none cursor-pointer pr-2"
+          >
+            {THEMES.map(theme => (
+              <option key={theme} value={theme}>{theme.charAt(0).toUpperCase() + theme.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        
+        <button 
+          onClick={handleExport}
+          className="bg-white/90 backdrop-blur p-2 rounded-lg shadow border border-gray-200 text-gray-700 hover:text-blue-600 transition-colors"
+          title="Export Markdown"
         >
-          {THEMES.map(theme => (
-            <option key={theme} value={theme}>{theme.charAt(0).toUpperCase() + theme.slice(1)}</option>
-          ))}
-        </select>
+          <Download className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Reveal Deck */}
