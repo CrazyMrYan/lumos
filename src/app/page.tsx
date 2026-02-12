@@ -19,8 +19,13 @@ const SlidesView = dynamic(() => import("@/components/SlidesView"), {
   loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Slides...</div>,
 });
 
+const WebsiteView = dynamic(() => import("@/components/WebsiteView"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Website...</div>,
+});
+
 export default function Home() {
-  const [content, setContent] = useState<string>("# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n---\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap");
+  const [content, setContent] = useState<string>("# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n---\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap\n- Site: Next.js + Tailwind");
   const [activeView, setActiveView] = useState<"slides" | "mindmap" | "site">("mindmap");
 
   return (
@@ -74,13 +79,8 @@ export default function Home() {
         
         <div className="flex-1 p-4 overflow-hidden relative">
           {activeView === "mindmap" && <MindMapView markdown={content} />}
-          {activeView === "slides" && <SlidesView key={content} markdown={content} />} {/* Key hack to force re-render on change for MVP stability */}
-
-          {activeView === "site" && (
-            <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
-              <p className="text-gray-400">Static Site View (Coming Soon)</p>
-            </div>
-          )}
+          {activeView === "slides" && <SlidesView key={content} markdown={content} />}
+          {activeView === "site" && <WebsiteView markdown={content} />}
         </div>
       </div>
     </main>
