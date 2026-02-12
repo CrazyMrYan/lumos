@@ -10,8 +10,13 @@ const Editor = dynamic(() => import("@/components/Editor"), {
   loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Editor...</div>,
 });
 
+const MindMapView = dynamic(() => import("@/components/MindMapView"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Mind Map...</div>,
+});
+
 export default function Home() {
-  const [content, setContent] = useState<string>("# Welcome to Lumos\n\nStart typing to see the magic happen.");
+  const [content, setContent] = useState<string>("# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap");
   const [activeView, setActiveView] = useState<"slides" | "mindmap" | "site">("mindmap");
 
   return (
@@ -63,18 +68,20 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="flex-1 p-4 overflow-auto">
-          {/* Placeholder for Views */}
-          <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
-            <div className="text-center text-gray-400">
-              <p className="text-lg font-medium mb-2">
-                {activeView === "mindmap" && "Mind Map View"}
-                {activeView === "slides" && "Slide Deck View"}
-                {activeView === "site" && "Static Site View"}
-              </p>
-              <p className="text-sm">Content length: {content.length} chars</p>
+        <div className="flex-1 p-4 overflow-hidden relative">
+          {activeView === "mindmap" && <MindMapView markdown={content} />}
+          
+          {activeView === "slides" && (
+            <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
+              <p className="text-gray-400">Slides View (Coming Soon)</p>
             </div>
-          </div>
+          )}
+
+          {activeView === "site" && (
+            <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
+              <p className="text-gray-400">Static Site View (Coming Soon)</p>
+            </div>
+          )}
         </div>
       </div>
     </main>

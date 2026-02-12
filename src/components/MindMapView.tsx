@@ -1,0 +1,45 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { Transformer } from "markmap-lib";
+import { Markmap } from "markmap-view";
+import { Toolbar } from "markmap-toolbar";
+import "markmap-toolbar/dist/style.css";
+
+const transformer = new Transformer();
+
+interface MindMapProps {
+  markdown: string;
+}
+
+export default function MindMapView({ markdown }: MindMapProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const mmRef = useRef<Markmap>();
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (svgRef.current && !mmRef.current) {
+      mmRef.current = Markmap.create(svgRef.current);
+      if (toolbarRef.current) {
+        const toolbar = Toolbar.create(mmRef.current);
+        toolbar.setBrand(false);
+        toolbarRef.current.append(toolbar.el);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mmRef.current && markdown) {
+      const { root } = transformer.transform(markdown);
+      mmRef.current.setData(root);
+      mmRef.current.fit();
+    }
+  }, [markdown]);
+
+  return (
+    <div className="relative w-full h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="absolute bottom-4 right-4 z-10" ref={toolbarRef} />
+      <svg ref={svgRef} className="w-full h-full" />
+    </div>
+  );
+}
