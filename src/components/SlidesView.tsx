@@ -90,8 +90,8 @@ export default function SlidesView({ markdown }: SlidesViewProps) {
   return (
     <div className="reveal w-full h-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" ref={deckRef}>
       <div className="slides">
-        <section data-markdown>
-          <textarea data-template>{markdown}</textarea>
+        <section data-markdown="">
+          <textarea data-template defaultValue={markdown} />
         </section>
       </div>
     </div>
