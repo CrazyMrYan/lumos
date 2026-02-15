@@ -5,6 +5,7 @@ import { Transformer } from "markmap-lib";
 import { Markmap } from "markmap-view";
 import { Toolbar } from "markmap-toolbar";
 import "markmap-toolbar/dist/style.css";
+import { Download } from "lucide-react";
 
 const transformer = new Transformer();
 
@@ -51,21 +52,63 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
       };
       walk(root);
 
-      // Apply theme options to markmap
-      // Markmap doesn't support full themes like reveal, but we can tweak initial options or CSS
-      // Re-create or update options if API allows, or rely on CSS variables inheritance
-      // For now, svg color inheritance handles text color usually.
-      
       mmRef.current.setData(root);
       mmRef.current.fit();
     }
   }, [markdown]);
+
+  const handleExport = () => {
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lumos Mindmap</title>
+<style>
+svg { width: 100vw; height: 100vh; background-color: ${isDark ? "#1e1e1e" : "#ffffff"}; }
+.markmap-node { color: ${isDark ? "#f8f8f2" : "#333333"}; }
+</style>
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
+<script>
+const { markmap } = window;
+const { Transformer } = window.markmap;
+const transformer = new Transformer();
+const markdown = ${JSON.stringify(markdown)};
+const { root } = transformer.transform(markdown);
+markmap.Markmap.create('#mindmap', null, root);
+</script>
+</body>
+</html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mindmap.html";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div 
       className="relative w-full h-full flex flex-col rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-colors duration-300"
       style={containerStyle}
     >
+      <div className="absolute top-4 right-4 z-20">
+         <button 
+          onClick={handleExport}
+          className="bg-white/90 backdrop-blur p-2 rounded-lg shadow border border-gray-200 text-gray-700 hover:text-blue-600 transition-colors"
+          title="Export HTML"
+        >
+          <Download className="w-4 h-4" />
+        </button>
+      </div>
       <div className="absolute bottom-4 right-4 z-10" ref={toolbarRef} />
       <svg ref={svgRef} className="w-full h-full" />
     </div>
