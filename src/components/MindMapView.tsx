@@ -20,6 +20,7 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Determine dark mode based on theme name (naive check for common dark themes)
+  // Fix: "white" theme should definitely be light mode.
   const isDark = ["black", "night", "blood", "league", "moon", "dracula"].includes(theme);
   
   // Dynamic styles for the container based on theme
@@ -66,6 +67,7 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
 <title>Lumos Mindmap</title>
 <style>
 svg { width: 100vw; height: 100vh; background-color: ${isDark ? "#1e1e1e" : "#ffffff"}; }
+body { margin: 0; padding: 0; overflow: hidden; }
 .markmap-node { color: ${isDark ? "#f8f8f2" : "#333333"}; }
 </style>
 </head>
