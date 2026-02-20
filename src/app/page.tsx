@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Monitor, Presentation, Network, Download, PanelRightClose, PanelRightOpen, Settings, Moon, Sun } from "lucide-react";
+import { Monitor, Presentation, Network, Download, PanelRightClose, PanelRightOpen, Settings, Moon, Sun, Upload, FileText } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { MindMapRef } from "@/components/MindMapView";
 
@@ -21,10 +21,12 @@ const SlidesView = dynamic(() => import("@/components/SlidesView"), {
   loading: () => <div className="h-full w-full flex items-center justify-center text-gray-400">Loading Slides...</div>,
 });
 
-const THEMES = [
+const SLIDE_THEMES = [
   "dracula", "black", "white", "league", "beige", "sky", 
   "night", "serif", "simple", "solarized", "blood", "moon"
 ];
+
+const EDITOR_THEMES = ["light", "dark", "ant-design", "wechat"];
 
 export default function Home() {
   const [content, setContent] = useLocalStorage<string>("lumos-content", `# 🪄 欢迎使用 Lumos
@@ -106,11 +108,13 @@ Lumos 不仅仅是幻灯片。
 删除这段文字，**开始创作吧**。`);
   const [activeView, setActiveView] = useLocalStorage<"slides" | "mindmap">("lumos-view", "slides");
   const [theme, setTheme] = useLocalStorage<string>("lumos-theme", "dracula");
+  const [editorTheme, setEditorTheme] = useLocalStorage<string>("lumos-editor-theme", "light");
   const [mindMapDark, setMindMapDark] = useLocalStorage<boolean>("lumos-mindmap-dark", false);
   const [showPreview, setShowPreview] = useLocalStorage<boolean>("lumos-preview-open", false);
   
   // Ref for MindMap export
   const mindMapRef = useRef<MindMapRef>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
     if (activeView === "slides") {
@@ -153,19 +157,11 @@ ${content}
       a.click();
       URL.revokeObjectURL(url);
     } else {
-      // Trigger MindMap export via ref
-      // Since MindMapView is dynamic, we need to be careful. 
-      // But DOM-based export in component is safer.
-      // Wait, dynamic import might mess up ref forwarding if not handled.
-      // For MVP robustness, let's try the direct ref call.
       if (mindMapRef.current) {
         mindMapRef.current.exportSvg();
       } else {
-        // Fallback: Dispatch a custom event that MindMapView listens to?
-        // Or simpler: grab the SVG from DOM directly here if ref fails.
         const svg = document.getElementById("lumos-mindmap-svg");
         if (svg) {
-           // Reuse the export logic here if ref is null (safety net)
            const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lumos Mindmap</title><style>svg{width:100vw;height:100vh;background-color:${mindMapDark?"#1e1e1e":"#ffffff"};}body{margin:0;padding:0;overflow:hidden;}.markmap-node{color:${mindMapDark?"#f8f8f2":"#333333"};}table{border-collapse:collapse;border:1px solid currentColor;font-size:0.8em;}th,td{border:1px solid currentColor;padding:4px;}</style></head><body><svg id="mindmap"></svg><script src="https://cdn.jsdelivr.net/npm/d3@7"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view"></script><script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script><script>const {markmap}=window;const {Transformer}=window.markmap;const transformer=new Transformer();const markdown=${JSON.stringify(content)};const {root}=transformer.transform(markdown);markmap.Markmap.create('#mindmap',null,root);</script></body></html>`;
            const blob = new Blob([htmlContent], { type: "text/html" });
            const url = URL.createObjectURL(blob);
@@ -179,15 +175,84 @@ ${content}
     }
   };
 
+  const handleImportMarkdown = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result;
+      if (typeof text === "string") {
+        setContent(text);
+      }
+    };
+    reader.readAsText(file);
+    // Reset input to allow re-importing same file
+    e.target.value = "";
+  };
+
+  const handleExportMarkdown = () => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="flex h-screen w-full bg-gray-50 overflow-hidden">
       {/* Editor Area */}
       <div className={`h-full transition-all duration-300 ease-in-out flex flex-col border-r border-gray-200 ${showPreview ? 'w-1/2' : 'w-full'}`}>
         <div className="h-14 border-b border-gray-200 flex items-center px-4 justify-between bg-white shrink-0">
-          <div className="flex items-center gap-2 text-gray-700 font-bold text-lg">
-            <span className="text-xl">🪄</span>
-            <span>Lumos</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-gray-700 font-bold text-lg mr-2">
+              <span className="text-xl">🪄</span>
+              <span>Lumos</span>
+            </div>
+            
+            {/* Editor Theme Selector */}
+            <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-md border border-gray-200">
+              <Settings className="w-3.5 h-3.5 text-gray-400" />
+              <select 
+                value={editorTheme}
+                onChange={(e) => setEditorTheme(e.target.value)}
+                className="bg-transparent text-xs font-medium text-gray-700 focus:outline-none cursor-pointer"
+                title="Editor Theme"
+              >
+                {EDITOR_THEMES.map(t => (
+                  <option key={t} value={t}>{t === "ant-design" ? "Ant Design" : t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Import/Export Markdown Actions */}
+            <div className="flex items-center gap-1">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept=".md,.txt" 
+                className="hidden" 
+                onChange={handleImportMarkdown} 
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="p-1.5 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+                title="Import Markdown"
+              >
+                <Upload className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={handleExportMarkdown}
+                className="p-1.5 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+                title="Export Markdown"
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+            </div>
           </div>
+
           <button
             onClick={() => setShowPreview(!showPreview)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${showPreview ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -197,7 +262,7 @@ ${content}
           </button>
         </div>
         <div className="flex-1 overflow-hidden relative">
-          <Editor initialValue={content} onChange={setContent} />
+          <Editor initialValue={content} onChange={setContent} previewTheme={editorTheme} />
         </div>
       </div>
 
@@ -236,8 +301,9 @@ ${content}
                     value={theme}
                     onChange={(e) => setTheme(e.target.value)}
                     className="bg-transparent text-xs font-medium text-gray-700 focus:outline-none cursor-pointer w-20"
+                    title="Slide Theme"
                   >
-                    {THEMES.map(t => (
+                    {SLIDE_THEMES.map(t => (
                       <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
                     ))}
                   </select>

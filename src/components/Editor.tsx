@@ -7,11 +7,18 @@ import "vditor/dist/index.css";
 interface EditorProps {
   initialValue?: string;
   onChange?: (value: string) => void;
+  previewTheme?: string;
 }
 
-export default function Editor({ initialValue = "# Hello Lumos", onChange }: EditorProps) {
+export default function Editor({ initialValue = "# Hello Lumos", onChange, previewTheme = "light" }: EditorProps) {
   const [vditor, setVditor] = useState<Vditor>();
   const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (vditor) {
+      vditor.setPreviewTheme(previewTheme);
+    }
+  }, [previewTheme, vditor]);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -43,6 +50,12 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange }: Edi
         "undo",
         "redo",
       ],
+      preview: {
+        theme: {
+          current: previewTheme,
+          path: "https://cdn.jsdelivr.net/npm/vditor/dist/css/content-theme",
+        },
+      },
       input: (value) => {
         onChange?.(value);
       },
