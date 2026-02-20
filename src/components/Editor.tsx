@@ -16,16 +16,13 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange, previ
 
   useEffect(() => {
     if (vditor) {
-      // Vditor doesn't expose setPreviewTheme directly in typing, but it's available on instance in some versions or via setTheme
-      // However, for content theme, it's usually set via options.preview.theme.current
-      // To dynamic update, we might need to destroy and recreate or use internal method if available.
-      // Actually, Vditor has a method `setTheme` but that's for UI theme.
-      // Content theme is dynamic. Let's try to update the DOM link directly if method is missing or re-init.
-      // Re-init is safest for theme change.
+      // Direct DOM manipulation fallback if method fails or CDN delay issues
+      // But let's try the method with full CDN path as required by Vditor
+      // Vditor needs the path, path/theme.css
+      // Actually setPreviewTheme takes (themeName, customPath)
       
-      // But re-init is heavy. Let's check docs. setPreviewTheme IS a method in Vditor, but maybe typing is outdated.
-      // Let's cast to any to bypass TS check if we are sure it exists, or handle it manually.
-      (vditor as any).setPreviewTheme?.(previewTheme, "https://cdn.jsdelivr.net/npm/vditor/dist/css/content-theme");
+      const themePath = "https://unpkg.com/vditor/dist/css/content-theme";
+      (vditor as any).setPreviewTheme?.(previewTheme, themePath);
     }
   }, [previewTheme, vditor]);
 
@@ -62,7 +59,7 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange, previ
       preview: {
         theme: {
           current: previewTheme,
-          path: "https://cdn.jsdelivr.net/npm/vditor/dist/css/content-theme",
+          path: "https://unpkg.com/vditor/dist/css/content-theme",
         },
       },
       input: (value) => {

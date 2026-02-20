@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Monitor, Presentation, Network, Download, PanelRightClose, PanelRightOpen, Settings, Moon, Sun, Upload, FileText } from "lucide-react";
+import { Monitor, Presentation, Network, Download, PanelRightClose, PanelRightOpen, Settings, Moon, Sun, FileUp, FileDown } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { MindMapRef } from "@/components/MindMapView";
 
@@ -241,14 +241,14 @@ ${content}
                 className="p-1.5 hover:bg-gray-100 rounded text-gray-600 transition-colors"
                 title="Import Markdown"
               >
-                <Upload className="w-4 h-4" />
+                <FileUp className="w-4 h-4" />
               </button>
               <button 
                 onClick={handleExportMarkdown}
                 className="p-1.5 hover:bg-gray-100 rounded text-gray-600 transition-colors"
                 title="Export Markdown"
               >
-                <FileText className="w-4 h-4" />
+                <FileDown className="w-4 h-4" />
               </button>
             </div>
           </div>
