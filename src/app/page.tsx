@@ -27,7 +27,83 @@ const THEMES = [
 ];
 
 export default function Home() {
-  const [content, setContent] = useLocalStorage<string>("lumos-content", "# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n---\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap");
+  const [content, setContent] = useLocalStorage<string>("lumos-content", `# 🪄 Welcome to Lumos
+## The AI-Native Presentation Engine
+
+> "One Source, Infinite Views."
+
+---
+
+## 🚀 Why Lumos?
+
+- **Markdown Core**: Write once, render anywhere.
+- **Instant Visualization**: Mind maps & Slides in real-time.
+- **Local First**: Your data never leaves your browser.
+
+---
+
+## 💻 Code Highlighting
+
+Lumos supports rich syntax highlighting for developers:
+
+\`\`\`tsx
+const Lumos = () => {
+  return (
+    <View>
+      <MindMap />
+      <Slides theme="dracula" />
+    </View>
+  );
+};
+\`\`\`
+
+---
+
+## 📊 Structured Data
+
+| Feature | Support | Status |
+|:---|:---:|:---|
+| Live Preview | ✅ | Ready |
+| HTML Export | ✅ | Ready |
+| AI Generation | 🚧 | Coming Soon |
+
+---
+
+## 🎨 Theming System
+
+Lumos comes with **10+ professional themes**:
+
+1. **Dracula** (Default) 🧛
+2. Black / White (Classic)
+3. League (Modern)
+4. Sky / Beige (Light)
+
+*Check the top-right menu!*
+
+---
+
+## 🧠 Mind Mapping
+
+Lumos isn't just for slides.
+Switch to **Mind Map** view to see:
+
+- Auto-folding branches
+- Dark mode adaptation
+- SVG export capabilities
+
+---
+
+## 📸 Rich Media
+
+![Technology](https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80)
+
+*Support for standard Markdown images.*
+
+---
+
+# 🏁 Ready to Start?
+
+Just delete this text and **start typing**.`);
   const [activeView, setActiveView] = useLocalStorage<"slides" | "mindmap">("lumos-view", "slides");
   const [theme, setTheme] = useLocalStorage<string>("lumos-theme", "dracula");
   const [mindMapDark, setMindMapDark] = useLocalStorage<boolean>("lumos-mindmap-dark", false);
