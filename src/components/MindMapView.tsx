@@ -20,23 +20,22 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Determine dark mode based on theme name
-  // Explicitly list LIGHT themes. Everything else defaults to dark or we check explicitly.
+  // Explicitly list LIGHT themes. Everything else defaults to dark.
   const isLight = ["white", "beige", "sky", "serif", "simple", "solarized"].includes(theme);
   
   // Dynamic styles for the container based on theme
-  const containerStyle = !isLight 
-    ? { backgroundColor: "#1e1e1e", color: "#f8f8f2" } 
-    : { backgroundColor: "#ffffff", color: "#333333" };
+  const containerStyle = {
+    backgroundColor: !isLight ? "#1e1e1e" : "#ffffff",
+    color: !isLight ? "#f8f8f2" : "#333333",
+  };
 
-  // Update markmap options when theme changes
   useEffect(() => {
     if (mmRef.current) {
-        // Force SVG text color update
+        // Force SVG text color and background update
         const svg = svgRef.current;
         if (svg) {
             svg.style.color = !isLight ? "#f8f8f2" : "#333333";
-            // Also need to update the node text colors potentially if markmap caches them
-            // Markmap uses currentColor for text usually, so setting on SVG should work.
+            svg.style.backgroundColor = !isLight ? "#1e1e1e" : "#ffffff";
         }
     }
   }, [theme, isLight]);
@@ -82,6 +81,9 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
 svg { width: 100vw; height: 100vh; background-color: ${!isLight ? "#1e1e1e" : "#ffffff"}; }
 body { margin: 0; padding: 0; overflow: hidden; }
 .markmap-node { color: ${!isLight ? "#f8f8f2" : "#333333"}; }
+/* Add basic table styles for foreignObject rendering */
+table { border-collapse: collapse; border: 1px solid currentColor; font-size: 0.8em; }
+th, td { border: 1px solid currentColor; padding: 4px; }
 </style>
 </head>
 <body>
