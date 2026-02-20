@@ -52,10 +52,11 @@ export default function SlidesView({ markdown, theme }: SlidesViewProps) {
         embedded: true,
         hash: false,
         keyboard: true,
-        mouseWheel: false,
+        mouseWheel: true, // Enable scroll for overflow
         transition: "slide",
         backgroundTransition: "fade",
         view: "default", 
+        scrollProgress: true, // Enable scroll progress bar
       });
 
       deck.initialize().then(() => {
@@ -81,7 +82,7 @@ export default function SlidesView({ markdown, theme }: SlidesViewProps) {
       {/* Reveal Deck */}
       <div className="reveal w-full h-full bg-gray-100 rounded-xl shadow-sm border border-gray-200 overflow-hidden" ref={deckRef}>
         <div className="slides">
-          <section data-markdown="">
+          <section data-markdown="" style={{ overflowY: "auto", maxHeight: "100%" }}>
             <textarea data-template defaultValue={markdown} />
           </section>
         </div>
