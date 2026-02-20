@@ -52,11 +52,11 @@ export default function SlidesView({ markdown, theme }: SlidesViewProps) {
         embedded: true,
         hash: false,
         keyboard: true,
-        mouseWheel: true, // Enable scroll for overflow
+        mouseWheel: false, // Disable auto-slide on scroll
         transition: "slide",
         backgroundTransition: "fade",
         view: "default", 
-        scrollProgress: true, // Enable scroll progress bar
+        scrollProgress: true,
       });
 
       deck.initialize().then(() => {
