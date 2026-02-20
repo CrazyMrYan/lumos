@@ -27,24 +27,24 @@ const THEMES = [
 ];
 
 export default function Home() {
-  const [content, setContent] = useLocalStorage<string>("lumos-content", `# 🪄 Welcome to Lumos
-## The AI-Native Presentation Engine
+  const [content, setContent] = useLocalStorage<string>("lumos-content", `# 🪄 欢迎使用 Lumos
+## AI 原生的演示文稿引擎
 
-> "One Source, Infinite Views."
-
----
-
-## 🚀 Why Lumos?
-
-- **Markdown Core**: Write once, render anywhere.
-- **Instant Visualization**: Mind maps & Slides in real-time.
-- **Local First**: Your data never leaves your browser.
+> "一次编写，无限视界。"
 
 ---
 
-## 💻 Code Highlighting
+## 🚀 为什么选择 Lumos?
 
-Lumos supports rich syntax highlighting for developers:
+- **Markdown 核心**: 写一次，到处运行。
+- **即时可视化**: 思维导图 & 幻灯片实时生成。
+- **本地优先**: 数据永远不出浏览器，绝对安全。
+
+---
+
+## 💻 代码高亮
+
+Lumos 为开发者提供丰富的语法高亮支持：
 
 \`\`\`tsx
 const Lumos = () => {
@@ -59,51 +59,51 @@ const Lumos = () => {
 
 ---
 
-## 📊 Structured Data
+## 📊 结构化数据
 
-| Feature | Support | Status |
+| 功能 | 支持 | 状态 |
 |:---|:---:|:---|
-| Live Preview | ✅ | Ready |
-| HTML Export | ✅ | Ready |
-| AI Generation | 🚧 | Coming Soon |
+| 实时预览 | ✅ | 就绪 |
+| HTML 导出 | ✅ | 就绪 |
+| AI 生成 | 🚧 | 开发中 |
 
 ---
 
-## 🎨 Theming System
+## 🎨 主题系统
 
-Lumos comes with **10+ professional themes**:
+Lumos 内置 **10+ 款专业主题**：
 
-1. **Dracula** (Default) 🧛
-2. Black / White (Classic)
-3. League (Modern)
-4. Sky / Beige (Light)
+1. **Dracula** (默认) 🧛
+2. Black / White (经典)
+3. League (现代)
+4. Sky / Beige (明亮)
 
-*Check the top-right menu!*
-
----
-
-## 🧠 Mind Mapping
-
-Lumos isn't just for slides.
-Switch to **Mind Map** view to see:
-
-- Auto-folding branches
-- Dark mode adaptation
-- SVG export capabilities
+*请查看右上角的菜单切换！*
 
 ---
 
-## 📸 Rich Media
+## 🧠 思维导图
+
+Lumos 不仅仅是幻灯片。
+切换到 **思维导图 (Mind Map)** 视图，你可以看到：
+
+- 自动折叠分支
+- 暗黑模式适配
+- SVG 矢量导出
+
+---
+
+## 📸 富媒体支持
 
 ![Technology](https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80)
 
-*Support for standard Markdown images.*
+*支持标准的 Markdown 图片语法。*
 
 ---
 
-# 🏁 Ready to Start?
+# 🏁 准备好了吗？
 
-Just delete this text and **start typing**.`);
+删除这段文字，**开始创作吧**。`);
   const [activeView, setActiveView] = useLocalStorage<"slides" | "mindmap">("lumos-view", "slides");
   const [theme, setTheme] = useLocalStorage<string>("lumos-theme", "dracula");
   const [mindMapDark, setMindMapDark] = useLocalStorage<boolean>("lumos-mindmap-dark", false);
