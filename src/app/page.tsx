@@ -28,7 +28,7 @@ const THEMES = [
 
 export default function Home() {
   const [content, setContent] = useLocalStorage<string>("lumos-content", `# 🪄 欢迎使用 Lumos
-## AI 原生的演示文稿引擎
+## 全能演示文稿引擎
 
 > "一次编写，无限视界。"
 

@@ -1,6 +1,6 @@
 # Lumos 🪄
 
-**Lumos** 是一个 AI 原生的“概念即演示”引擎。它能将单一的 Markdown 文档瞬间转化为精美的 **幻灯片 (Slides)** 和 **思维导图 (Mind Maps)**。
+**Lumos** 是一个Markdown原生的“概念即演示”引擎。它能将单一的 Markdown 文档瞬间转化为精美的 **幻灯片 (Slides)** 和 **思维导图 (Mind Maps)**。
 
 > **一个源文件，无限种视图。**
 > 告别排版，专注于创造。
