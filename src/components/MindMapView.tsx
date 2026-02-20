@@ -19,7 +19,7 @@ interface MindMapProps {
 
 const MindMapView = forwardRef<MindMapRef, MindMapProps>(({ markdown, darkMode = false }, ref) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const mmRef = useRef<Markmap>();
+  const mmRef = useRef<Markmap | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const containerStyle = {
