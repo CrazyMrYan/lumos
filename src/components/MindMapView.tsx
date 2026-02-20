@@ -106,6 +106,9 @@ markmap.Markmap.create('#mindmap', null, root);
       // Force update SVG styles directly to ensure background color is applied
       svgRef.current.style.backgroundColor = darkMode ? "#1e1e1e" : "#ffffff";
       svgRef.current.style.color = darkMode ? "#f8f8f2" : "#333333";
+      
+      // Force re-render of nodes text color if needed, though color inheritance usually works.
+      // We can also inject a style tag into the SVG for stricter control if inheritance fails.
     }
   }, [darkMode]);
 
