@@ -16,7 +16,7 @@ interface SlidesViewProps {
 
 export default function SlidesView({ markdown, theme }: SlidesViewProps) {
   const deckRef = useRef<HTMLDivElement>(null);
-  const revealInstance = useRef<Reveal.Api | null>(null);
+  const revealInstance = useRef<any>(null); // Use any to bypass missing type definitions
 
   // Handle Theme Injection
   useEffect(() => {
