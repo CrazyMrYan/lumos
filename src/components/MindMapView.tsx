@@ -28,6 +28,19 @@ export default function MindMapView({ markdown, theme }: MindMapProps) {
     ? { backgroundColor: "#1e1e1e", color: "#f8f8f2" } 
     : { backgroundColor: "#ffffff", color: "#333333" };
 
+  // Update markmap options when theme changes
+  useEffect(() => {
+    if (mmRef.current) {
+        // Force SVG text color update
+        const svg = svgRef.current;
+        if (svg) {
+            svg.style.color = !isLight ? "#f8f8f2" : "#333333";
+            // Also need to update the node text colors potentially if markmap caches them
+            // Markmap uses currentColor for text usually, so setting on SVG should work.
+        }
+    }
+  }, [theme, isLight]);
+
   useEffect(() => {
     if (svgRef.current && !mmRef.current) {
       mmRef.current = Markmap.create(svgRef.current);
@@ -102,15 +115,6 @@ markmap.Markmap.create('#mindmap', null, root);
       className="relative w-full h-full flex flex-col rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-colors duration-300"
       style={containerStyle}
     >
-      <div className="absolute top-4 right-4 z-20">
-         <button 
-          onClick={handleExport}
-          className="bg-white/90 backdrop-blur p-2 rounded-lg shadow border border-gray-200 text-gray-700 hover:text-blue-600 transition-colors"
-          title="Export HTML"
-        >
-          <Download className="w-4 h-4" />
-        </button>
-      </div>
       <div className="absolute bottom-4 right-4 z-10" ref={toolbarRef} />
       <svg ref={svgRef} className="w-full h-full" />
     </div>

@@ -27,7 +27,7 @@ const THEMES = [
 
 export default function Home() {
   const [content, setContent] = useLocalStorage<string>("lumos-content", "# Welcome to Lumos 🪄\n\n## Core Philosophy\n\n- **Single Source of Truth**\n- **AI-Powered**\n- **Client-First**\n\n---\n\n## Tech Stack\n\n- Editor: Vditor\n- Slides: Reveal.js\n- Mind Map: Markmap");
-  const [activeView, setActiveView] = useLocalStorage<"slides" | "mindmap">("lumos-view", "mindmap");
+  const [activeView, setActiveView] = useLocalStorage<"slides" | "mindmap">("lumos-view", "slides");
   const [theme, setTheme] = useLocalStorage<string>("lumos-theme", "dracula");
   const [showPreview, setShowPreview] = useLocalStorage<boolean>("lumos-preview-open", false);
 
@@ -115,15 +115,6 @@ ${content}
           <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white shrink-0">
             <div className="flex bg-gray-100 p-1 rounded-lg">
               <button
-                onClick={() => setActiveView("mindmap")}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  activeView === "mindmap" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <Network className="w-3.5 h-3.5" />
-                Mind Map
-              </button>
-              <button
                 onClick={() => setActiveView("slides")}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   activeView === "slides" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
@@ -131,6 +122,15 @@ ${content}
               >
                 <Presentation className="w-3.5 h-3.5" />
                 Slides
+              </button>
+              <button
+                onClick={() => setActiveView("mindmap")}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  activeView === "mindmap" ? "bg-white shadow-sm text-blue-600" : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Network className="w-3.5 h-3.5" />
+                Mind Map
               </button>
             </div>
 
