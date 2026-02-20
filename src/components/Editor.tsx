@@ -16,13 +16,18 @@ export default function Editor({ initialValue = "# Hello Lumos", onChange, previ
 
   useEffect(() => {
     if (vditor) {
-      // Direct DOM manipulation fallback if method fails or CDN delay issues
-      // But let's try the method with full CDN path as required by Vditor
-      // Vditor needs the path, path/theme.css
-      // Actually setPreviewTheme takes (themeName, customPath)
+      // Direct DOM manipulation to switch theme CSS link if Vditor's method is flaky
+      // Vditor creates a <link id="vditorContentTheme">. Let's try to update its href manually.
+      const themeLink = document.getElementById("vditorContentTheme") as HTMLLinkElement;
+      const themeUrl = `https://unpkg.com/vditor/dist/css/content-theme/${previewTheme}.css`;
       
-      const themePath = "https://unpkg.com/vditor/dist/css/content-theme";
-      (vditor as any).setPreviewTheme?.(previewTheme, themePath);
+      if (themeLink) {
+        themeLink.href = themeUrl;
+      } else {
+        // If not found (initial load might be slow), fallback to API
+        // But API might not trigger if value hasn't "changed" internally
+        (vditor as any).setPreviewTheme?.(previewTheme, "https://unpkg.com/vditor/dist/css/content-theme");
+      }
     }
   }, [previewTheme, vditor]);
 
