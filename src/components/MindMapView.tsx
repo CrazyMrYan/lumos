@@ -75,6 +75,7 @@ markmap.Markmap.create('#mindmap', null, root);
     if (svgRef.current && !mmRef.current) {
       mmRef.current = Markmap.create(svgRef.current);
       if (toolbarRef.current) {
+        // @ts-ignore - Toolbar create types might be mismatched in library version
         const toolbar = Toolbar.create(mmRef.current);
         toolbar.setBrand(false);
         toolbarRef.current.append(toolbar.el);
