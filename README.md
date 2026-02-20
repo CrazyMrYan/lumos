@@ -5,7 +5,7 @@
 > **一个源文件，无限种视图。**
 > 告别排版，专注于创造。
 
-![Lumos Preview](https://via.placeholder.com/1200x600?text=Lumos+Preview+Coming+Soon)
+![Lumos Preview](public/lumos_preview.png)
 
 ## ✨ 核心特性
 
